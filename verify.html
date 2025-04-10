@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Certificate Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .valid {
+      color: green;
+      font-size: 18px;
+    }
+    .invalid {
+      color: red;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Certificate Verification</h2>
+    <p id="result">Checking certificate ID...</p>
+  </div>
+
+  <script>
+    const certificates = {
+      "ICEM2025LIB001": {
+        name: "NAWALE GAURAV RAJU",
+        date: "10-Apr-2025",
+        status: "Valid"
+      },
+      "ICEM2025LIB002": {
+        name: "SAKSHI SHINDE",
+        date: "10-Apr-2025",
+        status: "Valid"
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const certId = params.get("id");
+    const result = document.getElementById("result");
+
+    if (certId && certificates[certId]) {
+      const cert = certificates[certId];
+      result.innerHTML = `
+        <div class="valid">✅ Certificate is <strong>VALID</strong><br><br>
+        📌 <strong>Name:</strong> ${cert.name}<br>
+        📅 <strong>Date:</strong> ${cert.date}<br>
+        🆔 <strong>ID:</strong> ${certId}</div>
+      `;
+    } else {
+      result.innerHTML = `
+        <div class="invalid">❌ Certificate Not Found<br><br>
+        Please contact the issuing authority for verification.</div>
+      `;
+    }
+  </script>
+</body>
+</html>
