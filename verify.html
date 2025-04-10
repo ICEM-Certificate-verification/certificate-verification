@@ -1,57 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Certificate Verification</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICEM Certificate Verification</title>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e8f0f7, #ffffff);
       margin: 0;
+      padding: 40px 20px;
+      text-align: center;
     }
     .card {
       background: white;
-      padding: 40px;
+      max-width: 700px;
+      margin: auto;
+      padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.15);
-      max-width: 600px;
-      width: 90%;
-      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     h2 {
-      margin-bottom: 20px;
-      color: #2c3e50;
+      color: #002147;
     }
-    .valid {
-      color: green;
-      font-size: 18px;
-    }
-    .invalid {
-      color: red;
-      font-size: 18px;
-    }
-    button {
-      margin-top: 20px;
+    .btn {
+      margin: 10px;
       padding: 10px 20px;
       font-size: 16px;
       border: none;
-      background-color: #3498db;
-      color: white;
       border-radius: 6px;
+      background-color: #002147;
+      color: white;
       cursor: pointer;
+    }
+    .input-area {
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 70%;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    #certificate-info {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .valid { color: green; }
+    .invalid { color: red; }
+    #qr-reader { width: 100%; max-width: 400px; margin: 20px auto; display: none; }
+    img.logo {
+      height: 80px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Certificate Verification</h2>
-    <p id="result">Checking certificate ID...</p>
-    <button onclick="downloadPDF()">⬇️ Download Certificate (PDF)</button>
+    <img src="https://indiraicem.ac.in/assets/images/ICEM-Logo.png" alt="ICEM Official Logo" class="logo">
+    <h2>ICEM Certificate Verification</h2>
+
+    <div id="option-select">
+      <button class="btn" onclick="showManual()">Verify using Certificate Number</button>
+      <button class="btn" onclick="startQRScan()">Verify using QR Code</button>
+    </div>
+
+    <div id="manual-entry" class="input-area" style="display:none">
+      <input type="text" id="certIdInput" placeholder="Enter Certificate ID">
+      <br>
+      <button class="btn" onclick="verifyCertificate()">Verify</button>
+    </div>
+
+    <div id="qr-reader"></div>
+
+    <div id="certificate-info"></div>
+    <button id="download-btn" class="btn" style="display:none" onclick="downloadPDF()">⬇️ Download Certificate</button>
   </div>
 
   <script>
@@ -65,73 +91,101 @@
         title: "Certificate of Appreciation",
         issued_by: "Prof. ABC, Head Librarian",
         achievement: "Outstanding engagement with library resources and promotion of knowledge culture."
-      },
-      "ICEM2025LIB002": {
-        name: "SAKSHI SHINDE",
-        college: "Indira College of Engineering and Management, Pune",
-        branch: "Information Technology",
-        prn: "15252",
-        date: "10-Apr-2025",
-        title: "Certificate of Appreciation",
-        issued_by: "Prof. ABC, Head Librarian",
-        achievement: "Exceptional commitment to library resource utilization and academic involvement."
       }
     };
 
-    const params = new URLSearchParams(window.location.search);
-    const certId = params.get("id");
-    const result = document.getElementById("result");
+    let currentCertId = null;
 
-    if (certId && certificates[certId]) {
+    function showManual() {
+      document.getElementById("manual-entry").style.display = "block";
+      document.getElementById("qr-reader").style.display = "none";
+      document.getElementById("certificate-info").innerHTML = "";
+    }
+
+    function startQRScan() {
+      document.getElementById("manual-entry").style.display = "none";
+      document.getElementById("certificate-info").innerHTML = "";
+      const qrReader = document.getElementById("qr-reader");
+      qrReader.style.display = "block";
+
+      const html5QrCode = new Html5Qrcode("qr-reader");
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        qrCodeMessage => {
+          html5QrCode.stop();
+          qrReader.style.display = "none";
+          document.getElementById("certIdInput").value = qrCodeMessage;
+          verifyCertificate(qrCodeMessage);
+        },
+        errorMessage => {}
+      ).catch(err => {
+        console.error("QR code scan failed", err);
+      });
+    }
+
+    function verifyCertificate(manualId = null) {
+      const certId = manualId || document.getElementById("certIdInput").value.trim();
       const cert = certificates[certId];
-      result.innerHTML = `
-        <div class="valid">
-          ✅ Certificate is <strong>VALID</strong><br><br>
-          📌 <strong>Name:</strong> ${cert.name}<br>
-          🏫 <strong>College:</strong> ${cert.college}<br>
-          🧑‍💻 <strong>Branch:</strong> ${cert.branch}<br>
-          🆔 <strong>PRN:</strong> ${cert.prn}<br>
-          🗓️ <strong>Date:</strong> ${cert.date}<br>
-          📄 <strong>Title:</strong> ${cert.title}<br>
-          📝 <strong>Achievement:</strong> ${cert.achievement}<br>
-          🖊️ <strong>Issued By:</strong> ${cert.issued_by}<br>
-          🔒 <strong>Certificate ID:</strong> ${certId}
-        </div>
-      `;
-    } else {
-      result.innerHTML = `
-        <div class="invalid">❌ Certificate Not Found<br><br>
-        Please contact the issuing authority for verification.</div>
-      `;
+      const infoDiv = document.getElementById("certificate-info");
+      currentCertId = certId;
+
+      if (cert) {
+        infoDiv.innerHTML = `
+          <div class="valid">
+            <h3>✅ Certificate Verified</h3>
+            <p><strong>Name:</strong> ${cert.name}</p>
+            <p><strong>College:</strong> ${cert.college}</p>
+            <p><strong>Branch:</strong> ${cert.branch}</p>
+            <p><strong>PRN:</strong> ${cert.prn}</p>
+            <p><strong>Date:</strong> ${cert.date}</p>
+            <p><strong>Title:</strong> ${cert.title}</p>
+            <p><strong>Achievement:</strong> ${cert.achievement}</p>
+            <p><strong>Issued By:</strong> ${cert.issued_by}</p>
+            <p><strong>Certificate ID:</strong> ${certId}</p>
+          </div>
+        `;
+        document.getElementById("download-btn").style.display = "inline-block";
+      } else {
+        infoDiv.innerHTML = `<div class="invalid">❌ Certificate Not Found. Please check the Certificate ID or QR Code.</div>`;
+        document.getElementById("download-btn").style.display = "none";
+      }
     }
   </script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     async function downloadPDF() {
+      if (!currentCertId || !certificates[currentCertId]) return;
       const { jsPDF } = window.jspdf;
-      const cert = certificates[certId];
-      if (!cert) return;
-
+      const cert = certificates[currentCertId];
       const doc = new jsPDF();
-      doc.setFontSize(18);
-      doc.text("Shree Chanakya Education Society's", 20, 20);
-      doc.text("Indira College of Engineering and Management, Pune", 20, 30);
-      doc.setFontSize(22);
-      doc.text(cert.title, 20, 50);
 
-      doc.setFontSize(14);
-      doc.text(`This certificate is awarded to: ${cert.name}`, 20, 70);
-      doc.text(`Branch: ${cert.branch}`, 20, 80);
-      doc.text(`PRN: ${cert.prn}`, 20, 90);
-      doc.text(`College: ${cert.college}`, 20, 100);
-      doc.text(`Date: ${cert.date}`, 20, 110);
-      doc.text(`Issued By: ${cert.issued_by}`, 20, 120);
-      doc.text(`Achievement:`, 20, 135);
-      doc.text(cert.achievement, 20, 145, { maxWidth: 170 });
-      doc.text(`Certificate ID: ${certId}`, 20, 160);
+      const logoUrl = "https://indiraicem.ac.in/assets/images/ICEM-Logo.png";
+      const logo = new Image();
+      logo.crossOrigin = "anonymous";
+      logo.onload = function() {
+        doc.addImage(logo, 'PNG', 150, 10, 40, 20);
+        doc.setFontSize(18);
+        doc.text("Shree Chanakya Education Society's", 20, 20);
+        doc.text("Indira College of Engineering and Management, Pune", 20, 30);
+        doc.setFontSize(22);
+        doc.text(cert.title, 20, 50);
 
-      doc.save(`${cert.name.replace(/ /g, '_')}_certificate.pdf`);
+        doc.setFontSize(14);
+        doc.text(`This certificate is awarded to: ${cert.name}`, 20, 70);
+        doc.text(`Branch: ${cert.branch}`, 20, 80);
+        doc.text(`PRN: ${cert.prn}`, 20, 90);
+        doc.text(`College: ${cert.college}`, 20, 100);
+        doc.text(`Date: ${cert.date}`, 20, 110);
+        doc.text(`Issued By: ${cert.issued_by}`, 20, 120);
+        doc.text(`Achievement:`, 20, 135);
+        doc.text(cert.achievement, 20, 145, { maxWidth: 170 });
+        doc.text(`Certificate ID: ${currentCertId}`, 20, 160);
+
+        doc.save(`${cert.name.replace(/ /g, '_')}_certificate.pdf`);
+      };
+      logo.src = logoUrl;
     }
   </script>
 </body>
