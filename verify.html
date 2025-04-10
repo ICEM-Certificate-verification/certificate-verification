@@ -56,6 +56,11 @@
       height: 80px;
       margin-bottom: 20px;
     }
+    #log-text {
+      color: #002147;
+      font-weight: bold;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -67,6 +72,8 @@
       <button class="btn" onclick="showManual()">Verify using Certificate Number</button>
       <button class="btn" onclick="startQRScan()">Verify using QR Code</button>
     </div>
+
+    <div id="log-text"></div>
 
     <div id="manual-entry" class="input-area" style="display:none">
       <input type="text" id="certIdInput" placeholder="Enter Certificate ID">
@@ -100,11 +107,13 @@
       document.getElementById("manual-entry").style.display = "block";
       document.getElementById("qr-reader").style.display = "none";
       document.getElementById("certificate-info").innerHTML = "";
+      document.getElementById("log-text").innerText = "Enter the certificate number from the physical or digital certificate.";
     }
 
     function startQRScan() {
       document.getElementById("manual-entry").style.display = "none";
       document.getElementById("certificate-info").innerHTML = "";
+      document.getElementById("log-text").innerText = "Scanning for QR Code...";
       const qrReader = document.getElementById("qr-reader");
       qrReader.style.display = "block";
 
@@ -117,10 +126,12 @@
           qrReader.style.display = "none";
           document.getElementById("certIdInput").value = qrCodeMessage;
           verifyCertificate(qrCodeMessage);
+          document.getElementById("log-text").innerText = "QR Code scanned successfully.";
         },
         errorMessage => {}
       ).catch(err => {
         console.error("QR code scan failed", err);
+        document.getElementById("log-text").innerText = "Error accessing camera. Please check your device permissions.";
       });
     }
 
@@ -146,9 +157,11 @@
           </div>
         `;
         document.getElementById("download-btn").style.display = "inline-block";
+        document.getElementById("log-text").innerText = "";
       } else {
         infoDiv.innerHTML = `<div class="invalid">❌ Certificate Not Found. Please check the Certificate ID or QR Code.</div>`;
         document.getElementById("download-btn").style.display = "none";
+        document.getElementById("log-text").innerText = "Invalid certificate ID. Please check again.";
       }
     }
   </script>
