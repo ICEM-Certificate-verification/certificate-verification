@@ -15,14 +15,15 @@
     }
     .card {
       background: white;
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
     h2 {
       color: #002147;
+      margin-bottom: 20px;
     }
     .btn {
       margin: 10px;
@@ -53,14 +54,42 @@
     #certificate-info {
       margin-top: 30px;
       text-align: left;
-      background: #f4f9ff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-    .valid { color: green; }
-    .invalid { color: red; }
-    #qr-reader { width: 100%; max-width: 400px; margin: 20px auto; display: none; }
+    .valid {
+      color: #2c7a3e;
+    }
+    .info-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .info-block {
+      width: calc(50% - 10px);
+      background: #f4f9ff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .info-label {
+      font-weight: 600;
+      display: block;
+      color: #002147;
+      margin-bottom: 5px;
+    }
+    .info-value {
+      color: #333;
+    }
+    #qr-reader {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+      display: none;
+    }
     img.logo {
       height: 80px;
       margin-bottom: 20px;
@@ -69,13 +98,6 @@
       color: #002147;
       font-weight: bold;
       margin-top: 20px;
-    }
-    .info-item {
-      margin: 6px 0;
-      font-size: 16px;
-    }
-    .info-label {
-      font-weight: 600;
     }
   </style>
 </head>
@@ -162,15 +184,17 @@
         infoDiv.innerHTML = `
           <div class="valid">
             <h3>✅ Certificate Verified</h3>
-            <div class="info-item"><span class="info-label">Name:</span> ${cert.name}</div>
-            <div class="info-item"><span class="info-label">College:</span> ${cert.college}</div>
-            <div class="info-item"><span class="info-label">Branch:</span> ${cert.branch}</div>
-            <div class="info-item"><span class="info-label">PRN:</span> ${cert.prn}</div>
-            <div class="info-item"><span class="info-label">Date:</span> ${cert.date}</div>
-            <div class="info-item"><span class="info-label">Title:</span> ${cert.title}</div>
-            <div class="info-item"><span class="info-label">Achievement:</span> ${cert.achievement}</div>
-            <div class="info-item"><span class="info-label">Issued By:</span> ${cert.issued_by}</div>
-            <div class="info-item"><span class="info-label">Certificate ID:</span> ${certId}</div>
+            <div class="info-section">
+              <div class="info-block"><span class="info-label">Name</span><span class="info-value">${cert.name}</span></div>
+              <div class="info-block"><span class="info-label">College</span><span class="info-value">${cert.college}</span></div>
+              <div class="info-block"><span class="info-label">Branch</span><span class="info-value">${cert.branch}</span></div>
+              <div class="info-block"><span class="info-label">PRN</span><span class="info-value">${cert.prn}</span></div>
+              <div class="info-block"><span class="info-label">Date</span><span class="info-value">${cert.date}</span></div>
+              <div class="info-block"><span class="info-label">Title</span><span class="info-value">${cert.title}</span></div>
+              <div class="info-block" style="width:100%;"><span class="info-label">Achievement</span><span class="info-value">${cert.achievement}</span></div>
+              <div class="info-block"><span class="info-label">Issued By</span><span class="info-value">${cert.issued_by}</span></div>
+              <div class="info-block"><span class="info-label">Certificate ID</span><span class="info-value">${certId}</span></div>
+            </div>
           </div>
         `;
         document.getElementById("download-btn").style.display = "inline-block";
@@ -214,6 +238,9 @@
         doc.text(`Certificate ID: ${currentCertId}`, 20, 160);
 
         doc.save(`${cert.name.replace(/ /g, '_')}_certificate.pdf`);
+      };
+      logo.onerror = function () {
+        alert("Failed to load the ICEM logo for the PDF. Please check the image URL or your internet connection.");
       };
       logo.src = logoUrl;
     }
