@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICEM Certificate Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: url('https://images.unsplash.com/photo-1606760722049-5b1d5ef1cfc0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      text-align: center;
+    }
+    header {
+      background-color: rgba(0, 33, 71, 0.9);
+      padding: 20px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    header img {
+      height: 60px;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+    h1 {
+      margin: 10px 0 0;
+      font-size: 26px;
+    }
+    .container {
+      padding: 60px 20px 100px;
+      backdrop-filter: blur(5px);
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      margin: 40px auto;
+      max-width: 800px;
+      animation: fadeInUp 1.2s ease-out;
+    }
+    .btn {
+      display: inline-block;
+      background-color: #3498db;
+      color: white;
+      padding: 15px 30px;
+      margin: 20px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 18px;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #2980b9;
+      transform: scale(1.05);
+    }
+    .info {
+      margin-top: 30px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    footer {
+      background-color: rgba(0, 33, 71, 0.9);
+      color: white;
+      padding: 15px 0;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/en/7/7c/Indira_College_Logo.png" alt="ICEM Logo">
+    <h1>Shree Chanakya Education Society's<br>Indira College of Engineering and Management, Pune</h1>
+  </header>
+
+  <div class="container">
+    <h2>Welcome to the ICEM Certificate Portal</h2>
+    <p>Verify the authenticity of student certificates issued by our Library Department.</p>
+
+    <a href="verify.html" class="btn">🔍 Verify Certificate</a>
+
+    <div class="info">
+      <h3>About Our Library</h3>
+      <p>The Library at Indira College of Engineering and Management is a hub of knowledge and academic resources. With a vast collection of books, journals, and digital materials, it supports our students in achieving academic excellence.</p>
+      <p>We provide state-of-the-art reading spaces, research databases, and digital learning tools to enhance learning outcomes. Students are encouraged to actively engage with library resources and foster a habit of lifelong learning.</p>
+      <p>This portal celebrates those who have shown exceptional commitment to utilizing the library for academic growth and knowledge sharing.</p>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Indira College of Engineering and Management | Library Department | Designed with ❤️ for ICEM
+  </footer>
+</body>
+</html>
