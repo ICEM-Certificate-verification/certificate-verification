@@ -19,7 +19,7 @@
       padding: 40px;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.15);
-      max-width: 500px;
+      max-width: 600px;
       width: 90%;
       text-align: center;
     }
@@ -35,25 +35,46 @@
       color: red;
       font-size: 18px;
     }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #3498db;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>Certificate Verification</h2>
     <p id="result">Checking certificate ID...</p>
+    <button onclick="downloadPDF()">⬇️ Download Certificate (PDF)</button>
   </div>
 
   <script>
     const certificates = {
       "ICEM2025LIB001": {
         name: "NAWALE GAURAV RAJU",
+        college: "Indira College of Engineering and Management, Pune",
+        branch: "Computer Engineering",
+        prn: "15251",
         date: "10-Apr-2025",
-        status: "Valid"
+        title: "Certificate of Appreciation",
+        issued_by: "Prof. ABC, Head Librarian",
+        achievement: "Outstanding engagement with library resources and promotion of knowledge culture."
       },
       "ICEM2025LIB002": {
         name: "SAKSHI SHINDE",
+        college: "Indira College of Engineering and Management, Pune",
+        branch: "Information Technology",
+        prn: "15252",
         date: "10-Apr-2025",
-        status: "Valid"
+        title: "Certificate of Appreciation",
+        issued_by: "Prof. ABC, Head Librarian",
+        achievement: "Exceptional commitment to library resource utilization and academic involvement."
       }
     };
 
@@ -64,16 +85,53 @@
     if (certId && certificates[certId]) {
       const cert = certificates[certId];
       result.innerHTML = `
-        <div class="valid">✅ Certificate is <strong>VALID</strong><br><br>
-        📌 <strong>Name:</strong> ${cert.name}<br>
-        📅 <strong>Date:</strong> ${cert.date}<br>
-        🆔 <strong>ID:</strong> ${certId}</div>
+        <div class="valid">
+          ✅ Certificate is <strong>VALID</strong><br><br>
+          📌 <strong>Name:</strong> ${cert.name}<br>
+          🏫 <strong>College:</strong> ${cert.college}<br>
+          🧑‍💻 <strong>Branch:</strong> ${cert.branch}<br>
+          🆔 <strong>PRN:</strong> ${cert.prn}<br>
+          🗓️ <strong>Date:</strong> ${cert.date}<br>
+          📄 <strong>Title:</strong> ${cert.title}<br>
+          📝 <strong>Achievement:</strong> ${cert.achievement}<br>
+          🖊️ <strong>Issued By:</strong> ${cert.issued_by}<br>
+          🔒 <strong>Certificate ID:</strong> ${certId}
+        </div>
       `;
     } else {
       result.innerHTML = `
         <div class="invalid">❌ Certificate Not Found<br><br>
         Please contact the issuing authority for verification.</div>
       `;
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    async function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const cert = certificates[certId];
+      if (!cert) return;
+
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text("Shree Chanakya Education Society's", 20, 20);
+      doc.text("Indira College of Engineering and Management, Pune", 20, 30);
+      doc.setFontSize(22);
+      doc.text(cert.title, 20, 50);
+
+      doc.setFontSize(14);
+      doc.text(`This certificate is awarded to: ${cert.name}`, 20, 70);
+      doc.text(`Branch: ${cert.branch}`, 20, 80);
+      doc.text(`PRN: ${cert.prn}`, 20, 90);
+      doc.text(`College: ${cert.college}`, 20, 100);
+      doc.text(`Date: ${cert.date}`, 20, 110);
+      doc.text(`Issued By: ${cert.issued_by}`, 20, 120);
+      doc.text(`Achievement:`, 20, 135);
+      doc.text(cert.achievement, 20, 145, { maxWidth: 170 });
+      doc.text(`Certificate ID: ${certId}`, 20, 160);
+
+      doc.save(`${cert.name.replace(/ /g, '_')}_certificate.pdf`);
     }
   </script>
 </body>
