@@ -1,248 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICEM Certificate Verification</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <meta charset="UTF-8" />
+  <title>Certificate Verification - ICEM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #e8f0f7, #ffffff);
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #f1f8e9);
+      color: #002147;
       margin: 0;
-      padding: 40px 20px;
+      padding: 30px;
       text-align: center;
     }
-    .card {
+
+    .container {
       background: white;
-      max-width: 900px;
-      margin: auto;
-      padding: 30px;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-    h2 {
+
+    h1 {
       color: #002147;
-      margin-bottom: 20px;
+      font-size: 28px;
     }
-    .btn {
-      margin: 10px;
-      padding: 12px 25px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background-color: #002147;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    .btn:hover {
-      background-color: #003b8b;
-      transform: scale(1.05);
-    }
-    .input-area {
-      margin-top: 20px;
-    }
-    input[type="text"] {
-      padding: 10px;
-      font-size: 16px;
-      width: 70%;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    #certificate-info {
-      margin-top: 30px;
-      text-align: left;
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-    .valid {
-      color: #2c7a3e;
-    }
-    .info-section {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 20px;
-    }
-    .info-block {
-      width: calc(50% - 10px);
-      background: #f4f9ff;
-      padding: 15px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-    }
-    .info-label {
-      font-weight: 600;
-      display: block;
-      color: #002147;
-      margin-bottom: 5px;
-    }
-    .info-value {
-      color: #333;
-    }
-    #qr-reader {
-      width: 100%;
-      max-width: 400px;
-      margin: 20px auto;
-      display: none;
-    }
-    img.logo {
-      height: 80px;
-      margin-bottom: 20px;
-    }
-    #log-text {
-      color: #002147;
+
+    .verified {
+      color: green;
       font-weight: bold;
+      font-size: 20px;
+    }
+
+    .not-found {
+      color: red;
+      font-weight: bold;
+    }
+
+    .info {
+      text-align: left;
       margin-top: 20px;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .info strong {
+      color: #002147;
+    }
+
+    .qr {
+      margin-top: 30px;
+    }
+
+    .download {
+      margin-top: 30px;
+    }
+
+    .download a {
+      background: #002147;
+      color: white;
+      padding: 10px 18px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    .download a:hover {
+      background: #003366;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <img src="https://indiraicem.ac.in/assets/images/ICEM-Logo.png" alt="ICEM Official Logo" class="logo">
-    <h2>ICEM Certificate Verification</h2>
-
-    <div id="option-select">
-      <button class="btn" onclick="showManual()">Verify using Certificate Number</button>
-      <button class="btn" onclick="startQRScan()">Verify using QR Code</button>
-    </div>
-
-    <div id="log-text"></div>
-
-    <div id="manual-entry" class="input-area" style="display:none">
-      <input type="text" id="certIdInput" placeholder="Enter Certificate ID">
-      <br>
-      <button class="btn" onclick="verifyCertificate()">Verify</button>
-    </div>
-
-    <div id="qr-reader"></div>
-
-    <div id="certificate-info"></div>
-    <br>
-    <button id="download-btn" class="btn" style="display:none" onclick="downloadPDF()">⬇️ Download Certificate (PDF)</button>
+  <div class="container" id="result">
+    <h1>ICEM Certificate Verification</h1>
+    <p>Verifying...</p>
   </div>
 
   <script>
-    const certificates = {
+    const params = new URLSearchParams(window.location.search);
+    const certId = params.get('id');
+
+    const data = {
       "ICEM2025LIB001": {
         name: "NAWALE GAURAV RAJU",
-        college: "Indira College of Engineering and Management, Pune",
+        prn: "CO24OB1121",
         branch: "Computer Engineering",
-        prn: "15251",
+        college: "Indira College of Engineering and Management, Pune",
         date: "10-Apr-2025",
         title: "Certificate of Appreciation",
-        issued_by: "Prof. ABC, Head Librarian",
-        achievement: "Outstanding engagement with library resources and promotion of knowledge culture."
+        achievement: "Outstanding engagement with library resources and promotion of knowledge culture.",
+        issuedBy: "Prof. ABC, Head Librarian",
+        downloadLink: "ICEM_Certificate_Gaurav_Nawale.pdf"
       }
     };
 
-    let currentCertId = null;
+    const container = document.getElementById("result");
 
-    function showManual() {
-      document.getElementById("manual-entry").style.display = "block";
-      document.getElementById("qr-reader").style.display = "none";
-      document.getElementById("certificate-info").innerHTML = "";
-      document.getElementById("log-text").innerText = "Enter the certificate number from the physical or digital certificate.";
-    }
-
-    function startQRScan() {
-      document.getElementById("manual-entry").style.display = "none";
-      document.getElementById("certificate-info").innerHTML = "";
-      document.getElementById("log-text").innerText = "Scanning for QR Code...";
-      const qrReader = document.getElementById("qr-reader");
-      qrReader.style.display = "block";
-
-      const html5QrCode = new Html5Qrcode("qr-reader");
-      html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        qrCodeMessage => {
-          html5QrCode.stop();
-          qrReader.style.display = "none";
-          document.getElementById("certIdInput").value = qrCodeMessage;
-          verifyCertificate(qrCodeMessage);
-          document.getElementById("log-text").innerText = "QR Code scanned successfully.";
-        },
-        errorMessage => {}
-      ).catch(err => {
-        console.error("QR code scan failed", err);
-        document.getElementById("log-text").innerText = "Error accessing camera. Please check your device permissions.";
+    if (certId && data[certId]) {
+      const cert = data[certId];
+      container.innerHTML = `
+        <h1>Certificate Verified ✅</h1>
+        <p class="verified">This certificate is valid and issued by ICEM.</p>
+        <div class="info">
+          <p><strong>Name:</strong> ${cert.name}</p>
+          <p><strong>PRN:</strong> ${cert.prn}</p>
+          <p><strong>Branch:</strong> ${cert.branch}</p>
+          <p><strong>College:</strong> ${cert.college}</p>
+          <p><strong>Date:</strong> ${cert.date}</p>
+          <p><strong>Title:</strong> ${cert.title}</p>
+          <p><strong>Achievement:</strong> ${cert.achievement}</p>
+          <p><strong>Issued By:</strong> ${cert.issuedBy}</p>
+          <p><strong>Certificate ID:</strong> ${certId}</p>
+        </div>
+        <div class="qr" id="qrcode"></div>
+        <div class="download">
+          <a href="${cert.downloadLink}" download>⬇️ Download Certificate (PDF)</a>
+        </div>
+      `;
+      new QRCode(document.getElementById("qrcode"), {
+        text: window.location.href,
+        width: 100,
+        height: 100
       });
-    }
-
-    function verifyCertificate(manualId = null) {
-      const certId = manualId || document.getElementById("certIdInput").value.trim();
-      const cert = certificates[certId];
-      const infoDiv = document.getElementById("certificate-info");
-      currentCertId = certId;
-
-      if (cert) {
-        infoDiv.innerHTML = `
-          <div class="valid">
-            <h3>✅ Certificate Verified</h3>
-            <div class="info-section">
-              <div class="info-block"><span class="info-label">Name</span><span class="info-value">${cert.name}</span></div>
-              <div class="info-block"><span class="info-label">College</span><span class="info-value">${cert.college}</span></div>
-              <div class="info-block"><span class="info-label">Branch</span><span class="info-value">${cert.branch}</span></div>
-              <div class="info-block"><span class="info-label">PRN</span><span class="info-value">${cert.prn}</span></div>
-              <div class="info-block"><span class="info-label">Date</span><span class="info-value">${cert.date}</span></div>
-              <div class="info-block"><span class="info-label">Title</span><span class="info-value">${cert.title}</span></div>
-              <div class="info-block" style="width:100%;"><span class="info-label">Achievement</span><span class="info-value">${cert.achievement}</span></div>
-              <div class="info-block"><span class="info-label">Issued By</span><span class="info-value">${cert.issued_by}</span></div>
-              <div class="info-block"><span class="info-label">Certificate ID</span><span class="info-value">${certId}</span></div>
-            </div>
-          </div>
-        `;
-        document.getElementById("download-btn").style.display = "inline-block";
-        document.getElementById("log-text").innerText = "";
-      } else {
-        infoDiv.innerHTML = `<div class="invalid">❌ Certificate Not Found. Please check the Certificate ID or QR Code.</div>`;
-        document.getElementById("download-btn").style.display = "none";
-        document.getElementById("log-text").innerText = "Invalid certificate ID. Please check again.";
-      }
-    }
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    async function downloadPDF() {
-      if (!currentCertId || !certificates[currentCertId]) return;
-      const { jsPDF } = window.jspdf;
-      const cert = certificates[currentCertId];
-      const doc = new jsPDF();
-
-      const logoUrl = "https://indiraicem.ac.in/assets/images/ICEM-Logo.png";
-      const logo = new Image();
-      logo.crossOrigin = "anonymous";
-      logo.onload = function() {
-        doc.addImage(logo, 'PNG', 150, 10, 40, 20);
-        doc.setFontSize(18);
-        doc.text("Shree Chanakya Education Society's", 20, 20);
-        doc.text("Indira College of Engineering and Management, Pune", 20, 30);
-        doc.setFontSize(22);
-        doc.text(cert.title, 20, 50);
-
-        doc.setFontSize(14);
-        doc.text(`This certificate is awarded to: ${cert.name}`, 20, 70);
-        doc.text(`Branch: ${cert.branch}`, 20, 80);
-        doc.text(`PRN: ${cert.prn}`, 20, 90);
-        doc.text(`College: ${cert.college}`, 20, 100);
-        doc.text(`Date: ${cert.date}`, 20, 110);
-        doc.text(`Issued By: ${cert.issued_by}`, 20, 120);
-        doc.text(`Achievement:`, 20, 135);
-        doc.text(cert.achievement, 20, 145, { maxWidth: 170 });
-        doc.text(`Certificate ID: ${currentCertId}`, 20, 160);
-
-        doc.save(`${cert.name.replace(/ /g, '_')}_certificate.pdf`);
-      };
-      logo.onerror = function () {
-        alert("Failed to load the ICEM logo for the PDF. Please check the image URL or your internet connection.");
-      };
-      logo.src = logoUrl;
+    } else {
+      container.innerHTML = `
+        <h1>Certificate Verification</h1>
+        <p class="not-found">❌ Certificate Not Found</p>
+        <p>Please contact the issuing authority for assistance.</p>
+      `;
     }
   </script>
 </body>
